@@ -1,8 +1,9 @@
-FROM scratch as builder
-WORKDIR /src
+FROM rust:1.67 as builder
+WORKDIR /usr/src/myapp
 COPY . .
-# RUN touch /bin/app
+RUN cargo install --path .
 
-FROM scratch
-COPY --from=builder /bin/app /app
-ENTRYPOINT ["/app"]
+FROM debian:bullseye-slim
+#RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /usr/local/cargo/bin/myapp /usr/local/bin/myapp
+CMD ["myapp"]
